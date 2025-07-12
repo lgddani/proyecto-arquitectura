@@ -1,5 +1,7 @@
 package diegosWafles.infraestructure.output.adapter;
 
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 import diegosWafles.domain.port.output.NotificationPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -17,6 +19,9 @@ public class NotificationAdapter implements NotificationPort {
 
     @Value("${spring.mail.username}")
     private String emailFrom;
+
+    @Value("${twilio.whatsapp-from}")
+    private String whatsappFrom;
 
     public NotificationAdapter(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -40,8 +45,39 @@ public class NotificationAdapter implements NotificationPort {
     }
 
     @Override
-    public void sendWhatsApp(String phoneNumber, String message) throws Exception {
-        // Por ahora solo log, implementaremos después
-        logger.info("📱 WhatsApp simulado enviado a: {} - Mensaje: {}", phoneNumber, message);
+    public void sendWhatsApp(String phoneNumber, String messageText) throws Exception {
+        try {
+            // Validar formato del número
+            String formattedNumber = formatPhoneNumber(phoneNumber);
+
+            Message message = Message.creator(
+                    new PhoneNumber("whatsapp:" + formattedNumber),
+                    new PhoneNumber(whatsappFrom),
+                    messageText
+            ).create();
+
+            logger.info("✅ WhatsApp enviado exitosamente a: {} - SID: {}", formattedNumber, message.getSid());
+        } catch (Exception e) {
+            logger.error("❌ Error enviando WhatsApp a {}: {}", phoneNumber, e.getMessage());
+            throw new Exception("Error al enviar WhatsApp: " + e.getMessage());
+        }
+    }
+
+    private String formatPhoneNumber(String phoneNumber) {
+        // Remover espacios y caracteres especiales
+        String cleanNumber = phoneNumber.replaceAll("[^+\\d]", "");
+
+        // Si no tiene código de país, agregar +593 (Ecuador)
+        if (!cleanNumber.startsWith("+")) {
+            if (cleanNumber.startsWith("0")) {
+                cleanNumber = "+593" + cleanNumber.substring(1);
+            } else if (cleanNumber.startsWith("593")) {
+                cleanNumber = "+" + cleanNumber;
+            } else {
+                cleanNumber = "+593" + cleanNumber;
+            }
+        }
+
+        return cleanNumber;
     }
 }

@@ -85,31 +85,65 @@ public class TestNotificationController {
     }
 
     @PostMapping("/simulate-low-stock")
-    public ResponseEntity<Object> simulateLowStock(@RequestParam String email) {
+    public ResponseEntity<Object> simulateLowStock(@RequestParam String email,
+                                                   @RequestParam(required = false) String phone) {
         try {
             String testMessage = """
-                ⚠️ ALERTA DE STOCK BAJO ⚠️
+                🧇 ALERTA DE STOCK BAJO - Diego's Wafles 🧇
                 
                 El ingrediente 'Harina' está próximo a agotarse.
-                Cantidad actual: 5.00 kg
-                Cantidad mínima: 10.00 kg
-                Proveedor: Distribuidora ABC
+                📊 Cantidad actual: 5.00 kg
+                ⚠️ Cantidad mínima: 10.00 kg
+                🏪 Proveedor: Distribuidora ABC
                 
                 Por favor, realizar pedido lo antes posible.
-                
-                Este es un mensaje de prueba del sistema Diego's Wafles.
                 """;
 
+            // Enviar email
             notificationPort.sendEmail(email, "🧇 STOCK BAJO - Diego's Wafles", testMessage);
 
+            String response = "Email de stock bajo enviado a: " + email;
+
+            // Enviar WhatsApp si se proporciona número
+            if (phone != null && !phone.trim().isEmpty()) {
+                notificationPort.sendWhatsApp(phone, testMessage);
+                response += " y WhatsApp enviado a: " + phone;
+            }
+
             return ResponseHandler.generateResponse(
-                    "Email de prueba enviado exitosamente",
+                    "Notificaciones de prueba enviadas exitosamente",
                     true,
-                    "Email de stock bajo enviado a: " + email
+                    response
             );
         } catch (Exception e) {
             return ResponseHandler.generateErrorResponse(
-                    "Error enviando email de prueba",
+                    "Error enviando notificaciones de prueba",
+                    e.getMessage()
+            );
+        }
+    }
+
+    @PostMapping("/whatsapp-only")
+    public ResponseEntity<Object> testWhatsAppOnly(@RequestParam String phone) {
+        try {
+            String testMessage = """
+                🧇 ¡Hola desde Diego's Wafles! 🧇
+                
+                Este es un mensaje de prueba del sistema de notificaciones.
+                
+                ¡Gracias por usar nuestro servicio!
+                """;
+
+            notificationPort.sendWhatsApp(phone, testMessage);
+
+            return ResponseHandler.generateResponse(
+                    "Mensaje de WhatsApp de prueba enviado",
+                    true,
+                    "WhatsApp enviado a: " + phone
+            );
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(
+                    "Error enviando WhatsApp de prueba",
                     e.getMessage()
             );
         }
