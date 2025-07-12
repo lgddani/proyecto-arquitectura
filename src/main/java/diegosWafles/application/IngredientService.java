@@ -25,18 +25,28 @@ public class IngredientService {
 
     public Ingredient searchByID(Integer ingredientID) {
         return ingredientRepo.findIngredientByID(ingredientID)
-                .orElseThrow(() -> new RuntimeException("No existe el ingrediente con ID: " + ingredientID));
+                .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado con ID: " + ingredientID));
     }
 
     public Ingredient saveIngredient(Ingredient ingredient) {
+        if (ingredient.getIngredientName() == null || ingredient.getIngredientName().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del ingrediente es obligatorio");
+        }
+
+        if (ingredient.getIngredientQuantity() == null || ingredient.getIngredientQuantity().compareTo(java.math.BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("La cantidad del ingrediente debe ser mayor o igual a 0");
+        }
+
         Provider provider = providerRepo.findProviderByID(ingredient.getProvider().getProviderID())
-                .orElseThrow(() -> new RuntimeException("No existe el proveedor: " + ingredient.getProvider().getProviderID()));
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con ID: " + ingredient.getProvider().getProviderID()));
 
         ingredient.setProvider(provider);
         return ingredientRepo.saveIngredientByID(ingredient);
     }
 
     public void deleteIngredient(Integer ingredientID) {
+        Ingredient existing = ingredientRepo.findIngredientByID(ingredientID)
+                .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado con ID: " + ingredientID));
         ingredientRepo.deleteIngredientByID(ingredientID);
     }
 }

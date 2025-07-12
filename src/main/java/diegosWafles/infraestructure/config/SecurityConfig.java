@@ -38,12 +38,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/register").hasAuthority("Administrador")
                         .requestMatchers("/api/users/me/password").hasAuthority("Vendedor")
                         .requestMatchers("/api/users/**").hasAuthority("Administrador")
+                        .requestMatchers("/api/roles/**").hasAuthority("Administrador")
                         .requestMatchers("/api/providers/**").hasAuthority("Administrador")
                         .requestMatchers("/api/ingredients/**").hasAuthority("Administrador")
                         .requestMatchers("/api/recipes/**").hasAuthority("Administrador")
                         .requestMatchers("/api/products/**").hasAuthority("Administrador")
                         .requestMatchers("/api/test/**").hasAuthority("Administrador")
-                        .requestMatchers("/api/orders/**").hasAuthority("Vendedor")
+                        .requestMatchers("/api/orders/**").hasAuthority("Administrador")
                         .anyRequest().authenticated()
                 );
 

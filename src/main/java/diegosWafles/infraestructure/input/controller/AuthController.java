@@ -1,8 +1,10 @@
 package diegosWafles.infraestructure.input.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import diegosWafles.domain.model.dto.LoginRequestDTO;
+import diegosWafles.domain.model.dto.LoginResponseDTO;
+import diegosWafles.domain.model.dto.ResponseHandler;
 import diegosWafles.domain.model.entities.User;
 import diegosWafles.domain.port.input.AuthServicePort;
 import diegosWafles.domain.model.dto.UserRegisterDTO;
@@ -19,25 +21,51 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-        String token = authService.login(loginRequest.getEmail(), loginRequest.getPassword());
-        return ResponseEntity.ok(token);
+    public ResponseEntity<Object> login(@RequestBody LoginRequestDTO loginRequest) {
+        try {
+            LoginResponseDTO loginResponse = authService.login(
+                    loginRequest.getEmail(),
+                    loginRequest.getPassword()
+            );
+
+            return ResponseHandler.generateResponse(
+                    "Acceso exitoso, bienvenido",
+                    true,
+                    loginResponse
+            );
+        } catch (RuntimeException e) {
+            return ResponseHandler.generateNotFoundResponse(
+                    "Error de autenticación",
+                    e.getMessage()
+            );
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(
+                    "Error interno del servidor",
+                    e.getMessage()
+            );
+        }
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
-        User newUser = authService.register(userRegisterDTO);
-        return ResponseEntity.ok(newUser);
+    public ResponseEntity<Object> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
+        try {
+            User newUser = authService.register(userRegisterDTO);
+
+            return ResponseHandler.generateResponse(
+                    "Usuario registrado exitosamente",
+                    true,
+                    newUser
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseHandler.generateNotFoundResponse(
+                    "Error de validación",
+                    e.getMessage()
+            );
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(
+                    "Error al registrar usuario",
+                    e.getMessage()
+            );
+        }
     }
-}
-
-class LoginRequest {
-    private String email;
-    private String password;
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 }

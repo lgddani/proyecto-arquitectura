@@ -21,14 +21,19 @@ public class ProviderService {
 
     public Provider searchByID(Integer providerID) {
         return providerRepo.findProviderByID(providerID)
-                .orElseThrow(() -> new RuntimeException("No existe el proveedor con ID: " + providerID));
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con ID: " + providerID));
     }
 
     public Provider saveProvider(Provider provider) {
+        if (provider.getProviderName() == null || provider.getProviderName().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del proveedor es obligatorio");
+        }
         return providerRepo.saveProviderByID(provider);
     }
 
     public void deleteProvider(Integer providerID) {
+        Provider existing = providerRepo.findProviderByID(providerID)
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con ID: " + providerID));
         providerRepo.deleteProviderByID(providerID);
     }
 }

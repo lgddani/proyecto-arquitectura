@@ -49,6 +49,11 @@ public class UserService {
                 ));
     }
 
+    public User findById(Integer id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+    }
+
     public User updateUser(Integer id, UserUpdateDTO dto) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -85,7 +90,8 @@ public class UserService {
     }
 
     public void deleteById(Integer id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
         userRepository.deleteById(id);
     }
-
 }

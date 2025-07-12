@@ -2,11 +2,15 @@ package diegosWafles.infraestructure.input.controller;
 
 import diegosWafles.application.OrderService;
 import diegosWafles.domain.model.dto.OrderDTO;
+import diegosWafles.domain.model.dto.OrderDetailDTO;
+import diegosWafles.domain.model.dto.ResponseHandler;
 import diegosWafles.domain.model.entities.Order;
 import diegosWafles.domain.model.entities.OrderProduct;
 import diegosWafles.domain.model.entities.Product;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,22 +25,78 @@ public class OrderController {
     }
 
     @PostMapping
-    public String createOrder(@RequestBody OrderDTO dto) {
-        Order order = toDomain(dto);
-        Order saved = service.createOrder(order);
-        return "Order registered with ID: " + saved.getOrderID();
+    public ResponseEntity<Object> createOrder(@RequestBody OrderDTO dto) {
+        try {
+            Order order = toDomain(dto);
+            Order saved = service.createOrder(order);
+            OrderDetailDTO savedDTO = toDetailDto(saved);
+
+            return ResponseHandler.generateResponse(
+                    "Orden creada exitosamente",
+                    true,
+                    savedDTO
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseHandler.generateNotFoundResponse(
+                    "Error de validación",
+                    e.getMessage()
+            );
+        } catch (RuntimeException e) {
+            return ResponseHandler.generateNotFoundResponse(
+                    "Error al crear orden",
+                    e.getMessage()
+            );
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(
+                    "Error interno al crear orden",
+                    e.getMessage()
+            );
+        }
     }
 
     @GetMapping
-    public List<OrderDTO> listOrders() {
-        return service.findAll().stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public ResponseEntity<Object> listOrders() {
+        try {
+            List<Order> orders = service.findAll();
+            List<OrderDetailDTO> ordersDTO = orders.stream()
+                    .map(this::toDetailDto)
+                    .collect(Collectors.toList());
+
+            return ResponseHandler.generateResponse(
+                    "Órdenes consultadas exitosamente",
+                    true,
+                    ordersDTO
+            );
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(
+                    "Error al consultar las órdenes",
+                    e.getMessage()
+            );
+        }
     }
 
     @GetMapping("/{orderID}")
-    public OrderDTO getOrder(@PathVariable Integer orderID) {
-        return toDto(service.findByID(orderID));
+    public ResponseEntity<Object> getOrder(@PathVariable Integer orderID) {
+        try {
+            Order order = service.findByID(orderID);
+            OrderDetailDTO orderDTO = toDetailDto(order);
+
+            return ResponseHandler.generateResponse(
+                    "Orden consultada exitosamente",
+                    true,
+                    orderDTO
+            );
+        } catch (RuntimeException e) {
+            return ResponseHandler.generateNotFoundResponse(
+                    "Orden no encontrada",
+                    e.getMessage()
+            );
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(
+                    "Error al consultar la orden",
+                    e.getMessage()
+            );
+        }
     }
 
     // –– MAPPERS ––
@@ -53,19 +113,26 @@ public class OrderController {
         return order;
     }
 
-    private OrderDTO toDto(Order order) {
-        OrderDTO dto = new OrderDTO();
-        dto.setComment(order.getComment());
-
-        List<OrderDTO.OrderProductDTO> products = order.getOrderProducts().stream()
+    private OrderDetailDTO toDetailDto(Order order) {
+        List<OrderDetailDTO.OrderProductDetailDTO> products = order.getOrderProducts().stream()
                 .map(op -> {
-                    OrderDTO.OrderProductDTO dtoItem = new OrderDTO.OrderProductDTO();
-                    dtoItem.setProductID(op.getProduct().getProductID());
-                    dtoItem.setQuantity(op.getQuantity());
-                    return dtoItem;
+                    BigDecimal subtotal = op.getProduct().getProductPrice()
+                            .multiply(BigDecimal.valueOf(op.getQuantity()));
+
+                    return new OrderDetailDTO.OrderProductDetailDTO(
+                            op.getProduct().getProductID(),
+                            op.getProduct().getProductName(),
+                            op.getProduct().getProductPrice(),
+                            op.getQuantity(),
+                            subtotal
+                    );
                 }).collect(Collectors.toList());
 
-        dto.setProducts(products);
-        return dto;
+        return new OrderDetailDTO(
+                order.getOrderID(),
+                order.getCreatedAt(),
+                order.getComment(),
+                products
+        );
     }
 }

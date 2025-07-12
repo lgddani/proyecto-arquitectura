@@ -2,6 +2,7 @@ package diegosWafles.infraestructure.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import diegosWafles.domain.model.dto.LoginResponseDTO;
 import diegosWafles.domain.model.entities.Role;
 import diegosWafles.domain.model.entities.User;
 import diegosWafles.domain.port.input.AuthServicePort;
@@ -10,7 +11,6 @@ import diegosWafles.domain.port.output.UserRepositoryPort;
 import diegosWafles.infraestructure.security.JwtUtils;
 import diegosWafles.domain.model.dto.UserRegisterDTO;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -30,16 +30,25 @@ public class AuthServiceImpl implements AuthServicePort {
     }
 
     @Override
-    public String login(String email, String password) {
+    public LoginResponseDTO login(String email, String password) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
             throw new RuntimeException("Usuario no encontrado");
         }
+
         User user = userOpt.get();
         if (!passwordEncoder.matches(password, user.getUserPassword())) {
             throw new RuntimeException("Credenciales incorrectas");
         }
-        return jwtUtils.generateJwtToken(user.getUserEmail());
+
+        String token = jwtUtils.generateJwtToken(user.getUserEmail());
+
+        return new LoginResponseDTO(
+                user.getUserID(),
+                token,
+                user.getUserEmail(),
+                user.getRole().getRolID()
+        );
     }
 
     @Override
@@ -69,5 +78,4 @@ public class AuthServiceImpl implements AuthServicePort {
 
         return userRepository.save(newUser);
     }
-
 }
