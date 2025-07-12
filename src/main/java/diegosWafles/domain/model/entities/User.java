@@ -7,16 +7,18 @@ public class User {
     private String userName;
     private String userEmail;
     private String userPassword;
+    private String userPhone;
     private boolean userStatus;
     private Role role;
 
     public User() {}
 
-    public User(Integer userID, String userName, String userEmail, String userPassword, boolean userStatus, Role role) {
+    public User(Integer userID, String userName, String userEmail, String userPassword, String userPhone, boolean userStatus, Role role) {
         this.userID = userID;
         this.userName = userName;
         this.userEmail = userEmail;
         this.userPassword = userPassword;
+        this.userPhone = userPhone;
         this.userStatus = userStatus;
         this.role = role;
     }
@@ -32,6 +34,9 @@ public class User {
 
     public String getUserPassword() { return userPassword; }
     public void setUserPassword(String userPassword) { this.userPassword = userPassword; }
+
+    public String getUserPhone() { return userPhone; }
+    public void setUserPhone(String userPhone) { this.userPhone = userPhone; }
 
     public boolean isUserStatus() { return userStatus; }
     public void setUserStatus(boolean userStatus) { this.userStatus = userStatus; }

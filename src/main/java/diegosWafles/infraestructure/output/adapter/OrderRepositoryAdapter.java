@@ -1,5 +1,6 @@
 package diegosWafles.infraestructure.output.adapter;
 
+import diegosWafles.application.NotificationService;
 import diegosWafles.domain.model.entities.*;
 import diegosWafles.domain.port.output.OrderRepositoryPort;
 import diegosWafles.infraestructure.output.entity.*;
@@ -20,6 +21,8 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     private final ProductRecipeJpaRepository productRecipeRepo;
     private final RecipeIngredientJpaRepository recipeIngredientRepo;
     private final IngredientJpaRepository ingredientRepo;
+    private final NotificationService notificationService;
+    private final IngredientRepositoryAdapter ingredientAdapter;
 
     public OrderRepositoryAdapter(
             OrderJpaRepository orderRepo,
@@ -27,7 +30,9 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
             ProductJpaRepository productRepo,
             ProductRecipeJpaRepository productRecipeRepo,
             RecipeIngredientJpaRepository recipeIngredientRepo,
-            IngredientJpaRepository ingredientRepo
+            IngredientJpaRepository ingredientRepo,
+            NotificationService notificationService,
+            IngredientRepositoryAdapter ingredientAdapter
     ) {
         this.orderRepo = orderRepo;
         this.orderProductRepo = orderProductRepo;
@@ -35,6 +40,8 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
         this.productRecipeRepo = productRecipeRepo;
         this.recipeIngredientRepo = recipeIngredientRepo;
         this.ingredientRepo = ingredientRepo;
+        this.notificationService = notificationService;
+        this.ingredientAdapter = ingredientAdapter;
     }
 
     @Override
@@ -100,6 +107,7 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
         }
 
         // Paso 5: descontar ingredientes
+        List<Integer> affectedIngredientIds = new ArrayList<>();
         for (Map.Entry<Integer, Double> entry : requiredIngredients.entrySet()) {
             IngredientEntity ing = ingredientsInDB.stream()
                     .filter(i -> i.getIngredientID().equals(entry.getKey()))
@@ -111,7 +119,17 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
             ));
 
             ingredientRepo.save(ing);
+            affectedIngredientIds.add(ing.getIngredientID());
         }
+
+        // Paso 6: verificar ingredientes con stock bajo y notificar
+        List<Ingredient> updatedIngredients = affectedIngredientIds.stream()
+                .map(id -> ingredientAdapter.findIngredientByID(id))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+
+        notificationService.checkAndNotifyLowStock(updatedIngredients);
 
         order.setOrderID(saved.getOrderID());
         order.setCreatedAt(saved.getCreatedAt());

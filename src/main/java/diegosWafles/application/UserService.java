@@ -33,6 +33,7 @@ public class UserService {
                 .map(user -> new UserListDTO(
                         user.getUserName(),
                         user.getUserEmail(),
+                        user.getUserPhone(),
                         user.getRole().getRolName()
                 ))
                 .toList();
@@ -43,6 +44,7 @@ public class UserService {
                 .map(user -> new UserListDTO(
                         user.getUserName(),
                         user.getUserEmail(),
+                        user.getUserPhone(),
                         user.getRole().getRolName()
                 ));
     }
@@ -56,6 +58,7 @@ public class UserService {
 
         existing.setUserName(dto.getUserName());
         existing.setUserEmail(dto.getUserEmail());
+        existing.setUserPhone(dto.getUserPhone());
         existing.setRole(role);
 
         return userRepository.save(existing);

@@ -38,12 +38,14 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     private User toDomain(UserEntity e) {
         Role roleDomain = roleRepositoryAdapter.findById(e.getRole().getRolID())
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
-        return new User(e.getUserID(), e.getUserName(), e.getUserEmail(), e.getUserPassword(), e.isUserStatus(), roleDomain);
+        return new User(e.getUserID(), e.getUserName(), e.getUserEmail(), e.getUserPassword(),
+                e.getUserPhone(), e.isUserStatus(), roleDomain);
     }
 
     private UserEntity toEntity(User u) {
         RoleEntity roleEntity = new RoleEntity(u.getRole().getRolID(), u.getRole().getRolName());
-        return new UserEntity(u.getUserID(), u.getUserName(), u.getUserEmail(), u.getUserPassword(), u.isUserStatus(), roleEntity);
+        return new UserEntity(u.getUserID(), u.getUserName(), u.getUserEmail(), u.getUserPhone(),
+                u.getUserPassword(), u.isUserStatus(), roleEntity);
     }
 
     @Override

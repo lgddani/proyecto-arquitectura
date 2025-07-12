@@ -76,7 +76,7 @@ public class RecipeController {
         List<RecipeIngredient> ingredients = dto.getIngredients().stream()
                 .map(i -> new RecipeIngredient(
                         null,
-                        new Ingredient(i.getIngredientID(), null, null, null, null),
+                        new Ingredient(i.getIngredientID(), null, null, null, null, null),
                         i.getRequiredQuantity()))
                 .collect(Collectors.toList());
         recipe.setRecipeIngredients(ingredients);

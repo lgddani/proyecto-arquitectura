@@ -54,6 +54,7 @@ public class IngredientRepositoryAdapter implements IngredientRepositoryPort {
                 entity.getIngredientName(),
                 Ingredient.IngredientUnit.valueOf(entity.getIngredientUnit().name()),
                 entity.getIngredientQuantity(),
+                entity.getMinimumQuantity(),
                 provider
         );
     }
@@ -64,6 +65,7 @@ public class IngredientRepositoryAdapter implements IngredientRepositoryPort {
         entity.setIngredientName(ingredient.getIngredientName());
         entity.setIngredientUnit(IngredientEntity.IngredientUnit.valueOf(ingredient.getIngredientUnit().name()));
         entity.setIngredientQuantity(ingredient.getIngredientQuantity());
+        entity.setMinimumQuantity(ingredient.getMinimumQuantity());
 
         ProviderEntity providerEntity = new ProviderEntity();
         providerEntity.setProviderID(ingredient.getProvider().getProviderID());

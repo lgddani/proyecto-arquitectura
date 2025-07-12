@@ -36,7 +36,7 @@ public class RecipeRepositoryAdapter implements RecipeRepositoryPort {
                     List<RecipeIngredient> recipeIngredients = ingredients.stream()
                             .map(e -> new RecipeIngredient(
                                     e.getRecipeID(),
-                                    new Ingredient(e.getIngredientID(), null, null, null, null),
+                                    new Ingredient(e.getIngredientID(), null, null, null, null, null),
                                     e.getRequiredQuantity()
                             )).collect(Collectors.toList());
 
@@ -76,7 +76,7 @@ public class RecipeRepositoryAdapter implements RecipeRepositoryPort {
         List<RecipeIngredient> recipeIngredients = ingredients.stream()
                 .map(e -> new RecipeIngredient(
                         e.getRecipeID(),
-                        new Ingredient(e.getIngredientID(), null, null, null, null),
+                        new Ingredient(e.getIngredientID(), null, null, null, null, null),
                         e.getRequiredQuantity()
                 )).collect(Collectors.toList());
 

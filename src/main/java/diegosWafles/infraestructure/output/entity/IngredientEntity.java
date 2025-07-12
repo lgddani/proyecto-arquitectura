@@ -23,6 +23,9 @@ public class IngredientEntity {
     @Column(name = "ingrediente_cantidad", precision = 10, scale = 2, nullable = false)
     private BigDecimal ingredientQuantity;
 
+    @Column(name = "ingrediente_cantidad_minima", precision = 10, scale = 2)
+    private BigDecimal minimumQuantity;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proveedor_id", referencedColumnName = "proveedor_id", nullable = false)
     private ProviderEntity provider;
@@ -44,6 +47,10 @@ public class IngredientEntity {
         return ingredientQuantity;
     }
 
+    public BigDecimal getMinimumQuantity() {
+        return minimumQuantity;
+    }
+
     public ProviderEntity getProvider() {
         return provider;
     }
@@ -63,6 +70,10 @@ public class IngredientEntity {
 
     public void setIngredientQuantity(BigDecimal ingredientQuantity) {
         this.ingredientQuantity = ingredientQuantity;
+    }
+
+    public void setMinimumQuantity(BigDecimal minimumQuantity) {
+        this.minimumQuantity = minimumQuantity;
     }
 
     public void setProvider(ProviderEntity provider) {

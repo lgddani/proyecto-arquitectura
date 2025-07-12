@@ -3,6 +3,7 @@ package diegosWafles.domain.model.dto;
 public class UserRegisterDTO {
     private String userName;
     private String userEmail;
+    private String userPhone;
     private String userPassword;
     private String userConfirmPassword;
     private Integer rolID;
@@ -12,6 +13,9 @@ public class UserRegisterDTO {
 
     public String getUserEmail() { return userEmail; }
     public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
+
+    public String getUserPhone() { return userPhone; }
+    public void setUserPhone(String userPhone) { this.userPhone = userPhone; }
 
     public String getUserPassword() { return userPassword; }
     public void setUserPassword(String userPassword) { this.userPassword = userPassword; }

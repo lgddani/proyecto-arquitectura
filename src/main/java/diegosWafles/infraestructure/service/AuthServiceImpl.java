@@ -62,8 +62,9 @@ public class AuthServiceImpl implements AuthServicePort {
         User newUser = new User();
         newUser.setUserName(dto.getUserName());
         newUser.setUserEmail(dto.getUserEmail());
+        newUser.setUserPhone(dto.getUserPhone());
         newUser.setUserPassword(passwordEncoder.encode(dto.getUserPassword()));
-        newUser.setUserStatus(true);  // o isActive(true)
+        newUser.setUserStatus(true);
         newUser.setRole(role);
 
         return userRepository.save(newUser);

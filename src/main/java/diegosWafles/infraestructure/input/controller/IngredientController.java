@@ -56,6 +56,7 @@ public class IngredientController {
                 ingredient.getIngredientName(),
                 ingredient.getIngredientUnit().name(),
                 ingredient.getIngredientQuantity(),
+                ingredient.getMinimumQuantity(),
                 ingredient.getProvider().getProviderID()
         );
     }
@@ -69,6 +70,7 @@ public class IngredientController {
                 dto.getIngredientName(),
                 Ingredient.IngredientUnit.valueOf(dto.getIngredientUnit()),
                 dto.getIngredientQuantity(),
+                dto.getMinimumQuantity() != null ? dto.getMinimumQuantity() : BigDecimal.valueOf(10),
                 provider
         );
     }

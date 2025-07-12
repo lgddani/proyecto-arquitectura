@@ -7,15 +7,18 @@ public class IngredientDTO {
     private String ingredientName;
     private String ingredientUnit;
     private BigDecimal ingredientQuantity;
+    private BigDecimal minimumQuantity;
     private Integer providerID;
 
     public IngredientDTO() {}
 
-    public IngredientDTO(Integer ingredientID, String ingredientName, String ingredientUnit, BigDecimal ingredientQuantity, Integer providerID) {
+    public IngredientDTO(Integer ingredientID, String ingredientName, String ingredientUnit,
+                         BigDecimal ingredientQuantity, BigDecimal minimumQuantity, Integer providerID) {
         this.ingredientID = ingredientID;
         this.ingredientName = ingredientName;
         this.ingredientUnit = ingredientUnit;
         this.ingredientQuantity = ingredientQuantity;
+        this.minimumQuantity = minimumQuantity;
         this.providerID = providerID;
     }
 
@@ -49,6 +52,14 @@ public class IngredientDTO {
 
     public void setIngredientQuantity(BigDecimal ingredientQuantity) {
         this.ingredientQuantity = ingredientQuantity;
+    }
+
+    public BigDecimal getMinimumQuantity() {
+        return minimumQuantity;
+    }
+
+    public void setMinimumQuantity(BigDecimal minimumQuantity) {
+        this.minimumQuantity = minimumQuantity;
     }
 
     public Integer getProviderID() {
