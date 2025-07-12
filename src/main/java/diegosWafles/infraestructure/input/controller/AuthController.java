@@ -10,6 +10,7 @@ import diegosWafles.domain.port.input.AuthServicePort;
 import diegosWafles.domain.model.dto.UserRegisterDTO;
 import jakarta.validation.Valid;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
