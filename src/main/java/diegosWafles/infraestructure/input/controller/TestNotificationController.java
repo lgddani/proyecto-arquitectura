@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -145,6 +146,62 @@ public class TestNotificationController {
         } catch (Exception e) {
             return ResponseHandler.generateErrorResponse(
                     "Error enviando WhatsApp de prueba",
+                    e.getMessage()
+            );
+        }
+    }
+
+    // 🆕 NUEVOS ENDPOINTS PARA DEBUGGING
+
+    @GetMapping("/notification-status")
+    public ResponseEntity<Object> getNotificationStatus() {
+        try {
+            Set<Integer> notified = notificationService.getNotifiedIngredients();
+
+            return ResponseHandler.generateResponse(
+                    "Estado de notificaciones obtenido",
+                    true,
+                    "Ingredientes ya notificados: " + notified
+            );
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(
+                    "Error obteniendo estado de notificaciones",
+                    e.getMessage()
+            );
+        }
+    }
+
+    @PostMapping("/reset-notification/{ingredientID}")
+    public ResponseEntity<Object> resetNotification(@PathVariable Integer ingredientID) {
+        try {
+            notificationService.resetNotification(ingredientID);
+
+            return ResponseHandler.generateResponse(
+                    "Notificación resetada exitosamente",
+                    true,
+                    "Ingrediente ID " + ingredientID + " puede ser notificado nuevamente"
+            );
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(
+                    "Error reseteando notificación",
+                    e.getMessage()
+            );
+        }
+    }
+
+    @PostMapping("/clear-all-notifications")
+    public ResponseEntity<Object> clearAllNotifications() {
+        try {
+            notificationService.clearAllNotifications();
+
+            return ResponseHandler.generateResponse(
+                    "Todas las notificaciones limpiadas",
+                    true,
+                    "Todos los ingredientes pueden ser notificados nuevamente"
+            );
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(
+                    "Error limpiando notificaciones",
                     e.getMessage()
             );
         }
